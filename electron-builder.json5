@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "YourAppID",
+  "asar": true,
+  "productName": "YourAppName",
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": [
+    "dist",
+    "dist-electron"
+  ],
+  "mac": {
+    bundleVersion: '1.0',
+    hardenedRuntime: true,
+    gatekeeperAssess: false,
+    notarize: false,
+    type: 'distribution',
+    icon: "electron/icons/img.png",
+    category: "public.app-category.utilities",
+    identity: "Developer ID Application: Your Name (Team ID)",
+    entitlements: 'electron-builder/entitlements.plist',
+    entitlementsInherit: 'electron-builder/entitlements.plist',
+    provisioningProfile: 'electron-builder/comalibabaslobs.provisionprofile',
+    target: [
+      {
+        target: 'dmg',
+        arch: [
+          'x64',
+          'arm64',
+          'universal'
+        ]
+      }
+    ],
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  },
+  dmg: {
+    contents: [
+      {
+        x: 410,
+        y: 150,
+        type: 'link',
+        path: '/Applications'
+      },
+      {
+        x: 130,
+        y: 150,
+        type: 'file'
+      }
+    ],
+    sign: false
+  },
+  "win": {
+    icon: "electron/icons/img.png",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true
+  },
+  "linux": {
+    icon: "electron/icons/img.png",
+    "target": [
+      "AppImage"
+    ],
+    "artifactName": "${productName}-Linux-${version}.${ext}"
+  }
+}

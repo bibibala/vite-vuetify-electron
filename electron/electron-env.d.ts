@@ -25,3 +25,15 @@ declare namespace NodeJS {
 interface Window {
   ipcRenderer: import('electron').IpcRenderer;
 }
+
+import { IpcRenderer } from 'electron';
+
+declare global {
+  interface Window {
+    ipcRenderer: IpcRenderer & {
+      select: (args: any) => void;
+      selectOver: (args: any) => void;
+      readDir: (pathRoot: string) => string[];
+    };
+  }
+}

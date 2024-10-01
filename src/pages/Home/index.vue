@@ -7,7 +7,7 @@ const rootPath = ref('');
 function selectFiles(source: string) {
   window.ipcRenderer.select(source);
   window.ipcRenderer.selectOver((event, args) => {
-    // console.log(event, args);
+    console.log(event, args);
     if (args) {
       rootPath.value = args.response.filePaths[0];
       const res = window.ipcRenderer.readDir(rootPath.value);

@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
+    "@types/node": "^22.7.4",
     "@vitejs/plugin-vue": "^5.1.4",
     "electron": "^32.1.2",
     "electron-builder": "^25.0.5",
@@ -34,7 +35,8 @@
     "vite-plugin-electron": "^0.28.8",
     "vite-plugin-electron-renderer": "^0.14.6",
     "vite-plugin-vuetify": "^2.0.4",
-    "vue-tsc": "^2.1.6"
+    "vue-tsc": "^2.1.6",
+    "x2js": "^3.4.4"
   },
   "main": "dist-electron/main.js"
 }

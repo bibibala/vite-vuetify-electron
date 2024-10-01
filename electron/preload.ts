@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import { ipcRenderer, contextBridge } from 'electron';
 
 // --------- Expose some API to the Renderer process ---------
@@ -22,5 +23,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   // You can expose other APTs you need here.
-  // ...
+  select: (args: any) => ipcRenderer.send('select', args),
+  selectOver: (args: any) => ipcRenderer.on('selectOver', args),
+  readDir: (pathRoot: string) => {
+    return fs.readdirSync(pathRoot);
+  },
 });

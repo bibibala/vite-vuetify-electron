@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -35,6 +35,7 @@ function createWindow() {
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, 'vite.svg'),
     webPreferences: {
+      nodeIntegration: true,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -70,6 +71,15 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+  }
+});
+
+ipcMain.on('select', async (event, args) => {
+  const response = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+  if (response) {
+    event.reply('selectOver', { args, response });
   }
 });
 

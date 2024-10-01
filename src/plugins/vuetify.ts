@@ -46,6 +46,11 @@ export default createVuetify({
       density: 'compact',
       variant: 'outlined',
     },
+    VBtn: {
+      color: 'primary',
+      density: 'compact',
+      variant: 'outlined',
+    },
   },
   theme: {
     defaultTheme: 'myCustomLightTheme',

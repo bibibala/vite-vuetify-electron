@@ -6,6 +6,7 @@ node_modules
 .quasar
 /dist
 /release
+/dist-electron
 /quasar.config.*.temporary.compiled*
 
 # Cordova related directories and files

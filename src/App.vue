@@ -9,5 +9,4 @@
 
 <script lang="ts" setup>
 import LeftMenu from './Layout/index.vue';
-
 </script>

@@ -4,15 +4,15 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "target": "ES2020", // 移动到这里
-    "module": "ESNext", // 移动到这里
+    "target": "ES2020",
+    "module": "ESNext",
     "lib": [
       "ES2020",
       "DOM",
       "DOM.Iterable"
     ],
     "skipLibCheck": true,
-    "moduleResolution": "node", // 根据项目需要调整
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

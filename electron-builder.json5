@@ -11,47 +11,47 @@
     "dist-electron"
   ],
   "mac": {
-    bundleVersion: '1.0',
-    hardenedRuntime: true,
-    gatekeeperAssess: false,
-    notarize: false,
-    type: 'distribution',
-    icon: "electron/icons/img.png",
-    category: "public.app-category.utilities",
-    identity: "Developer ID Application: Your Name (Team ID)",
-    entitlements: 'electron-builder/entitlements.plist',
-    entitlementsInherit: 'electron-builder/entitlements.plist',
-    provisioningProfile: 'electron-builder/comalibabaslobs.provisionprofile',
-    target: [
+    "bundleVersion": "1.0",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "notarize": false,
+    "type": "distribution",
+    "icon": "electron/icons/img.png",
+    "category": "public.app-category.utilities",
+    "identity": "Developer ID Application: Your Name (Team ID)",
+    "entitlements": "electron-builder/entitlements.plist",
+    "entitlementsInherit": "electron-builder/entitlements.plist",
+    "provisioningProfile": "electron-builder/comalibabaslobs.provisionprofile",
+    "target": [
       {
-        target: 'dmg',
-        arch: [
-          'x64',
-          'arm64',
-          'universal'
+        "target": "dmg",
+        "arch": [
+          "x64",
+          "arm64",
+          "universal"
         ]
       }
     ],
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
-  dmg: {
-    contents: [
+  "dmg": {
+    "contents": [
       {
-        x: 410,
-        y: 150,
-        type: 'link',
-        path: '/Applications'
+        "x": 410,
+        "y": 150,
+        "type": "link",
+        "path": "/Applications"
       },
       {
-        x: 130,
-        y: 150,
-        type: 'file'
+        "x": 130,
+        "y": 150,
+        "type": "file"
       }
     ],
-    sign: false
+    "sign": false
   },
   "win": {
-    icon: "electron/icons/img.png",
+    "icon": "electron/icons/img.png",
     "target": [
       {
         "target": "nsis",
@@ -69,7 +69,7 @@
     "deleteAppDataOnUninstall": true
   },
   "linux": {
-    icon: "electron/icons/img.png",
+    "icon": "electron/icons/img.png",
     "target": [
       "AppImage"
     ],

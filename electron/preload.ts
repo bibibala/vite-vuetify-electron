@@ -36,13 +36,11 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
           return await finder.readResourcesForLanguage(item);
         }),
       );
-
-      return resources.flatMap((resources, langIndex) => {
+      return resources.flatMap((resources) => {
         return resources.map((resource) => ({
           name: resource.name,
           from: resource.from,
           text: resource.text,
-          language: languages[langIndex], // 正确关联语言
         }));
       });
     } catch (error) {

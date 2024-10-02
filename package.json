@@ -1,13 +1,12 @@
 {
   "name": "vite-project",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
-  "productName": "app",
   "description": "vite electron vuetify",
   "author": {
-    "email": "",
-    "name": ""
+    "email": "1140918095@qq.com",
+    "name": "zsqNightwish"
   },
   "scripts": {
     "dev": "vite",

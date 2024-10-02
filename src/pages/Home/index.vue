@@ -18,7 +18,6 @@ function selectFiles(source: string) {
 }
 
 const headers = [
-  { title: '语言', value: 'language' },
   { title: 'KEY', value: 'name' },
   { title: 'VALUE', value: 'text' },
   { title: '路径', value: 'from' },

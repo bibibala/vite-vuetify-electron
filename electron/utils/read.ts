@@ -58,6 +58,7 @@ class AndroidResourceFinder {
             // strings.xml doesn't exist in this folder
           }
         }
+        // 确保递归调用
         await this.traverseFolderForLanguages(itemPath);
       }
     }
@@ -79,6 +80,7 @@ class AndroidResourceFinder {
 
     if (itemPath.indexOf(path.sep + 'build' + path.sep) === -1) {
       if (stats.isDirectory()) {
+        // 确保递归调用
         await this.traverseFolderForResources(itemPath);
       } else if (stats.isFile()) {
         await this.processFile(itemPath);
@@ -107,7 +109,13 @@ class AndroidResourceFinder {
 
   private parseXml(data: string, filePath: string): void {
     const x2js = new X2js();
-    const json = x2js.xml2js(data);
+    const json = x2js.xml2js(data) as {
+      resources?: {
+        string:
+          | { _name: string; __text: string }
+          | { _name: string; __text: string }[];
+      };
+    };
 
     if (json.resources && json.resources.string) {
       const strings = Array.isArray(json.resources.string)

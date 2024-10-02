@@ -34,6 +34,8 @@ declare global {
       select: (args: any) => void;
       selectOver: (args: any) => void;
       readDir: (pathRoot: string) => string[];
+      loadDll: (args: number) => string;
+      invokeResponse: (args: any) => any;
     };
   }
 }

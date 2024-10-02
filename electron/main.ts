@@ -1,7 +1,8 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { addFunc } from './utils/loadDll.ts';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 
 createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,8 +31,8 @@ let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 1000,
-    height: 650,
+    minWidth: 1200,
+    minHeight: 750,
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, 'vite.svg'),
     webPreferences: {
@@ -81,6 +82,11 @@ ipcMain.on('select', async (event, args = {}) => {
   if (response) {
     event.reply('selectOver', { args, response });
   }
+});
+
+ipcMain.on('invoke-handle', (event, args) => {
+  const result = addFunc(args, 2);
+  event.reply('invoke-handle-response', result);
 });
 
 app.whenReady().then(createWindow);

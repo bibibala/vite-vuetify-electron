@@ -26,25 +26,35 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   select: (args: any) => ipcRenderer.send('select', args),
   selectOver: (args: any) => ipcRenderer.on('selectOver', args),
   readDir: async (dirPath: string) => {
-    const finder = new AndroidResourceFinder(dirPath);
-    try {
-      // 首先找出所有语言所在目录
-      const languages = await finder.findLanguageFolders();
-      // 使用 Promise.all 并行读取所有语言的资源
-      const resources = await Promise.all(
-        languages.map(async (item) => {
-          return await finder.readResourcesForLanguage(item);
-        }),
-      );
-      return resources.flatMap((resources) => {
-        return resources.map((resource) => ({
-          name: resource.name,
-          from: resource.from,
-          text: resource.text,
-        }));
-      });
-    } catch (error) {
-      console.error('Error processing resources:', error);
+    if (dirPath) {
+      const finder = new AndroidResourceFinder(dirPath);
+      try {
+        // 首先找出所有语言所在目录
+        const languages = await finder.findLanguageFolders();
+        // 使用 Promise.all 并行读取所有语言的资源
+        const resources = await Promise.all(
+          languages.map(async (item) => {
+            return await finder.readResourcesForLanguage(item);
+          }),
+        );
+        return resources.flatMap((resources) => {
+          return resources.map((resource) => ({
+            name: resource.name,
+            from: resource.from,
+            text: resource.text,
+          }));
+        });
+      } catch (error) {
+        console.error('Error processing resources:', error);
+      }
+    } else {
+      console.log('file select cancel');
     }
+  },
+  loadDll: (args) => {
+    ipcRenderer.send('invoke-handle', args);
+  },
+  invokeResponse: (args) => {
+    ipcRenderer.on('invoke-handle-response', args);
   },
 });

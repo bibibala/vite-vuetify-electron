@@ -74,7 +74,7 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('select', async (event, args) => {
+ipcMain.on('select', async (event, args = {}) => {
   const response = await dialog.showOpenDialog({
     properties: ['openDirectory'],
   });

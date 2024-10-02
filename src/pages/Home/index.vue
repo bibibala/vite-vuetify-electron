@@ -3,21 +3,26 @@ import { ref } from 'vue';
 import PageLayout from '@/components/PageLayout.vue';
 
 const rootPath = ref('');
+const keyValueList = ref([]);
 
 function selectFiles(source: string) {
   window.ipcRenderer.select(source);
-  window.ipcRenderer.selectOver((event, args) => {
-    console.log(event, args);
-    if (args) {
-      rootPath.value = args.response.filePaths[0];
-      const res = window.ipcRenderer.readDir(rootPath.value);
-      console.log(res);
-      // 递归读res，直到返回为null证明是根目录
-      // 读取 文件
-      // ？？？？？
+  window.ipcRenderer.selectOver(async (_, response) => {
+    if (response) {
+      rootPath.value = response.response.filePaths[0];
+      console.time('readDirTimer'); // 开始计时
+      keyValueList.value = await window.ipcRenderer.readDir(rootPath.value);
+      console.timeEnd('readDirTimer'); // 结束计时并输出时间
     }
   });
 }
+
+const headers = [
+  { title: '语言', value: 'language' },
+  { title: 'KEY', value: 'name' },
+  { title: 'VALUE', value: 'text' },
+  { title: '路径', value: 'from' },
+];
 </script>
 
 <template>
@@ -35,7 +40,11 @@ function selectFiles(source: string) {
       </v-text-field>
     </template>
     <template #body>
-      <div class="text-primary">hello world</div>
+      <v-data-table
+        :headers="headers"
+        :items="keyValueList"
+        item-key="name"
+      ></v-data-table>
     </template>
   </PageLayout>
 </template>

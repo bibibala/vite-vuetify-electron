@@ -50,11 +50,5 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     } else {
       console.log('file select cancel');
     }
-  },
-  loadDll: (args) => {
-    ipcRenderer.send('invoke-handle', args);
-  },
-  invokeResponse: (args) => {
-    ipcRenderer.on('invoke-handle-response', args);
-  },
+  }
 });

@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { addFunc } from './utils/loadDll.ts';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 
 createRequire(import.meta.url);
@@ -82,11 +81,6 @@ ipcMain.on('select', async (event, args = {}) => {
   if (response) {
     event.reply('selectOver', { args, response });
   }
-});
-
-ipcMain.on('invoke-handle', (event, args) => {
-  const result = addFunc(args, 2);
-  event.reply('invoke-handle-response', result);
 });
 
 app.whenReady().then(createWindow);

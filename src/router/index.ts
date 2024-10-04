@@ -11,11 +11,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Home',
     component: Home,
   },
-  {
-    path: '/RunC',
-    name: 'RunC',
-    component: () => import('@/pages/RunC/index.vue'),
-  },
 ];
 
 const router = createRouter({

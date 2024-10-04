@@ -13,7 +13,6 @@ const tab = ref(0);
 
 const items = [
   { text: 'Home', icon: 'mdi-clock' },
-  { text: 'RunC', icon: 'mdi-account' },
 ];
 </script>
 

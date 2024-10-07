@@ -33,7 +33,7 @@ jobs:
 
       - name: Set npm registry mirror
         run: |
-          npm config set registry https://registry.npmmirror.com/
+          npm config set registry https://registry.npmjs.org/
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2

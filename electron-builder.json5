@@ -17,7 +17,6 @@
     "gatekeeperAssess": false,
     "type": "distribution",
     "category": "public.app-category.utilities",
-    "identity": "Developer ID Application: Your Name (Team ID)",
     "entitlements": "electron-builder/entitlements.plist",
     "entitlementsInherit": "electron-builder/entitlements.plist",
     "provisioningProfile": "electron-builder/comalibabaslobs.provisionprofile",

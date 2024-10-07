@@ -30,7 +30,7 @@
       - name: Build Electron App
         run: npm run build
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
 
       - name: Cleanup Artifacts for Windows
         if: matrix.os == 'windows-latest'
@@ -54,4 +54,4 @@
         with:
           files: "release/**"
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

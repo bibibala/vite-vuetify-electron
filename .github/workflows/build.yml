@@ -56,13 +56,14 @@ jobs:
         run: pnpm run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-build
           path: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.snap
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.snap

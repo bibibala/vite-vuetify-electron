@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
   "asar": true,
   "productName": "Tome",
   "directories": {
@@ -18,7 +17,6 @@
     "type": "distribution",
     "icon": "assets/logo.png",
     "category": "public.app-category.utilities",
-    "identity": "Developer ID Application: Your Name (Team ID)",
     "entitlements": "electron-builder/entitlements.plist",
     "entitlementsInherit": "electron-builder/entitlements.plist",
     "provisioningProfile": "electron-builder/comalibabaslobs.provisionprofile",

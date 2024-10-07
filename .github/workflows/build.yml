@@ -1,14 +1,14 @@
-  name: Build App
+name: Build App
 
-  on:
-    push:
-      branches:
-        - master
+on:
+  push:
+    branches:
+      - master
 
-  jobs:
-    release:
-      name: build and release electron app
-      runs-on: ${{ matrix.os }}
+jobs:
+  release:
+    name: build and release electron app
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false

@@ -3,7 +3,7 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "YourAppID",
   "asar": true,
-  "productName": "vuetify",
+  "productName": "vuetify-vue",
   "directories": {
     "output": "release/${version}"
   },
@@ -12,52 +12,12 @@
     "dist-electron"
   ],
   "mac": {
-    "bundleVersion": "1.0",
-    "hardenedRuntime": true,
-    "gatekeeperAssess": false,
-    "type": "distribution",
-    "category": "public.app-category.utilities",
-    "entitlements": "electron-builder/entitlements.plist",
-    "entitlementsInherit": "electron-builder/entitlements.plist",
-    "provisioningProfile": "electron-builder/comalibabaslobs.provisionprofile",
-    "icon": "src/assets/logo512X512.png",
     "target": [
-      {
-        "target": "dmg",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      },
-      {
-        "target": "mas",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      }
+      "dmg",
     ],
-    "sign": false,
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
-  "dmg": {
-    "contents": [
-      {
-        "x": 410,
-        "y": 150,
-        "type": "link",
-        "path": "/Applications"
-      },
-      {
-        "x": 130,
-        "y": 150,
-        "type": "file"
-      }
-    ],
-    "sign": false
-  },
   "win": {
-    "icon": "src/assets/logo.png",
     "target": [
       {
         "target": "nsis",
@@ -75,15 +35,8 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
-    "icon": "src/assets/logo.png",
     "target": [
-      {
-        "target": "AppImage",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      }
+      "AppImage"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
   }

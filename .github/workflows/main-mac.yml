@@ -1,51 +1,89 @@
-name: Build
+name: Build Electron App
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
-      - "**.spec.js"
-      - ".idea"
-      - ".vscode"
-      - ".dockerignore"
-      - "Dockerfile"
-      - ".gitignore"
-      - ".github/**"
-      - "!.github/workflows/main.yml"
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        # [macos-latest, ubuntu-latest, windows-latest]
-        os: [macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: mac
+
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
-      - name: Install Dependencies
+      - name: Set npm registry mirror
+        run: |
+          npm config set registry https://registry.npmjs.org/
+
+      - name: Install dependencies
         run: npm install
 
-      - name: Build Release Files
-        run: npm run build
+      - name: Build Electron app for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          npm run build -- --mac --x64
+          npm run build -- --mac --arm64
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Build Electron app for Windows
+        if: matrix.os == 'windows-latest'
+        run: npm run build -- --win --x64
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+
+      - name: Build Electron app for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build -- --linux --x64
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+
+      - name: List build output
+        run: |
+          ls -R release
+          ls -R dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: tts-vue-${{ matrix. os }}
-          path: release/*/*.dmg
-          retention-days: 30
+          name: ${{ matrix.platform }}-build
+          path: |
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.snap
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.ref }}
+          name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+          files: |
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

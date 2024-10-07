@@ -31,9 +31,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set npm registry mirror
+      - name: Set pnpm registry mirror
         run: |
-          npm config set registry https://registry.npmjs.org/
+          pnpm set registry https://registry.npmmirror.com/
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2

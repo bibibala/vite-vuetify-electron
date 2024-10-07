@@ -1,14 +1,14 @@
-name: Build Electron App
+name: Build and Release Electron App
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 jobs:
   build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
@@ -21,64 +21,58 @@ jobs:
           - os: macos-14
             platform: mac-arm
 
-    runs-on: ${{ matrix.os }}
-
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
 
-      - name: Set npm registry mirror
-        run: |
-          npm config set registry https://registry.npmjs.org/
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install dependencies
-        run: npm install
+    - name: Build Electron app
+      env:
+        GH_TOKEN: ${{secrets.PUBLIC_RELEASE }}
+      run: npm run build
 
-      - name: Build Electron app
-        run: npm run build
-        env:
-          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.platform }}-build
+        path: |
+          dist/*.dmg
+          dist/*.AppImage
+          dist/*.snap
+          dist/*.exe
+          dist/*.zip
 
-      - name: Get Version (Linux/macOS)
-        if: runner.os != 'Windows'
-        id: get_version_unix
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
 
-      - name: Get Version (Windows)
-        if: runner.os == 'Windows'
-        id: get_version_windows
-        run: |
-          $version = (Get-Content package.json | ConvertFrom-Json).version
-          echo "version=$version" >> $env:GITHUB_ENV
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.platform }}-build
-          path: |
-            release/**/*.{exe,dmg,AppImage,snap}
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.version }}
-          release_name: Release ${{ env.version }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.version }}
-          files: |
-            release/**/*.{exe,dmg,AppImage,snap}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+      with:
+        files: |
+          linux-build/*
+          windows-build/*
+          mac-intel-build/*
+          mac-arm-build/*

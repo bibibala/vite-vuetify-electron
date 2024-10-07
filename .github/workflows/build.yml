@@ -1,80 +1,81 @@
-name: Build and Release Electron App
+name: Build Electron App
 
 on:
   push:
-    tags:
-      - 'v*' # 匹配 v0.0.1, v1.2.3 等等的 tag
-
-  workflow_dispatch: # 允许手动触发
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [win32, linux, mac]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: mac-intel
+            arch: x64
+          - os: macos-14
+            platform: mac-arm
+            arch: arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
+
+      - name: Set npm registry mirror
+        run: |
+          npm config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build for ${{ matrix.platform }}
-        run: |
-          npm run build
+      - name: Build Electron app
+        run: npm run build
         env:
-          ELECTRON_PLATFORM_NAME: ${{ matrix.platform }} # electron-builder 依据此变量打包不同平台的应用
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          ELECTRON_ARCH: ${{ matrix.arch }}
 
-      - name: Archive build files
-        run: |
-          mkdir -p release
-          mv dist/* release/
-        if: always()
-
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: electron-app-${{ matrix.platform }}
-          path: release/
-          retention-days: 7
+          name: ${{ matrix.platform }}-${{ matrix.arch }}-build
+          path: |
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.snap
 
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: electron-app-${{ matrix.platform }}
-          path: release/${{ matrix.platform }}
-
-      - name: Create GitHub Release
+      - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }} # 使用推送的标签作为 release 的 tag
-          name: Release ${{ github.ref }} # Release 名称与 tag 名一致
-          body: |
-            发布版本 ${{ github.ref }}，包含以下产物：
-            - Windows 打包文件
-            - macOS 打包文件
-            - Linux 打包文件
-          files: |
-            release/win32/*
-            release/linux/*
-            release/mac/*
+          tag_name: v${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.ref }}
+          files: |
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.snap
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

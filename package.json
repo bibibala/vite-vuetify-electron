@@ -2,11 +2,11 @@
   "name": "electron-vue-vite",
   "version": "0.0.2",
   "main": "dist-electron/main/index.js",
-  "description": "",
+  "description": "Your app description goes here",
   "author": {
-    "name": "",
-    "url": "",
-    "email": ""
+    "name": "zsqNightwish",
+    "url": "https://github.com/bibibala",
+    "email": "1140918095@qq.com"
   },
   "private": true,
   "debug": {

@@ -1,0 +1,86 @@
+name: Build Electron App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: mac
+            arch: x64
+          - os: macos-14
+            platform: mac
+            arch: arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set npm registry mirror
+        run: npm config set registry https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Get package version
+        id: package_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Build Electron app
+        run: |
+          if [ "${{ matrix.platform }}" = "mac" ]; then
+            npm run build -- --mac --${{ matrix.arch }}
+          elif [ "${{ matrix.platform }}" = "windows" ]; then
+            npm run build -- --win --x64
+          elif [ "${{ matrix.platform }}" = "linux" ]; then
+            npm run build -- --linux --x64
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: List build output
+        run: |
+          ls -R dist || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.arch || 'x64' }}-build
+          path: |
+            dist/*.dmg
+            dist/*-setup.exe
+            dist/*.AppImage
+            dist/*.snap
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.package_version.outputs.VERSION }}
+          name: ${{ github.event.repository.name }} v${{ steps.package_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/*.dmg
+            dist/*-setup.exe
+            dist/*.AppImage
+            dist/*.snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

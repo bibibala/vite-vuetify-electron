@@ -18,7 +18,6 @@ jobs:
             platform: windows
           - os: macos-latest
             platform: mac
-            arch: [x64, arm64]
 
     runs-on: ${{ matrix.os }}
 
@@ -40,10 +39,8 @@ jobs:
       - name: Build Electron app for macOS
         if: matrix.os == 'macos-latest'
         run: |
-          for arch in ${{ toJson(matrix.arch) }}; do
-            echo "Building for macOS $arch"
-            npm run build -- --mac --arch=$arch
-          done
+          npm run build -- --mac --arch=x64
+          npm run build -- --mac --arch=arm64
         env:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
           CSC_IDENTITY_AUTO_DISCOVERY: false

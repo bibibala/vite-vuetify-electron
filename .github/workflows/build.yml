@@ -44,22 +44,23 @@ jobs:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
+      - name: Get Version
+        id: get_version
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-build
           path: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
+            release/**/*.{exe,dmg,AppImage,snap}
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          tag_name: ${{ env.version }}
+          release_name: Release ${{ env.version }}
           draft: false
           prerelease: false
         env:
@@ -68,11 +69,8 @@ jobs:
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
+          tag_name: ${{ env.version }}
           files: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
+            release/**/*.{exe,dmg,AppImage,snap}
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

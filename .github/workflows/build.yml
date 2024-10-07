@@ -31,34 +31,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set pnpm registry mirror
+      - name: Set npm registry mirror
         run: |
-          pnpm set registry https://registry.npmmirror.com/
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6.32.9
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          npm config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Build Electron app
-        run: pnpm run build
+        run: npm run build
         env:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
           CSC_IDENTITY_AUTO_DISCOVERY: false

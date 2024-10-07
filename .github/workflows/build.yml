@@ -1,98 +1,57 @@
-name: Build Electron App
+  name: Build App
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  on:
+    push:
+      branches:
+        - master
 
-jobs:
-  build:
+  jobs:
+    release:
+      name: build and release electron app
+      runs-on: ${{ matrix.os }}
+
     strategy:
+      fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            target: x86_64-unknown-linux-gnu
-          - os: windows-latest
-            platform: windows
-            target: x86_64-pc-windows-msvc
-          - os: macos-latest
-            platform: mac
-            target: x86_64-apple-darwin
-          - os: macos-latest
-            platform: mac
-            target: aarch64-apple-darwin
-
-    runs-on: ${{ matrix.os }}
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out git repository
+        uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Set npm registry mirror
-        run: |
-          npm config set registry https://registry.npmjs.org/
-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build Electron app
-        run: |
-          if [ "${{ matrix.platform }}" = "mac" ]; then
-            if [ "${{ matrix.target }}" = "x86_64-apple-darwin" ]; then
-              npm run build -- --mac --x64
-            elif [ "${{ matrix.target }}" = "aarch64-apple-darwin" ]; then
-              npm run build -- --mac --arm64
-            fi
-          elif [ "${{ matrix.platform }}" = "windows" ]; then
-            npm run build -- --win --x64
-          elif [ "${{ matrix.platform }}" = "linux" ]; then
-            npm run build -- --linux --x64
-          fi
+      - name: Build Electron App
+        run: npm run build
         env:
-          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: List build output
+      - name: Cleanup Artifacts for Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          ls -R release || true
-          ls -R dist || true
+          npx rimraf "release/!(*.exe)"
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.platform }}-${{ matrix.target }}-build
-          path: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
-            dist/**/*.exe
-            dist/**/*.dmg
-            dist/**/*.AppImage
-            dist/**/*.snap
+      - name: Cleanup Artifacts for MacOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          npx rimraf "release/!(*.dmg)"
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3.0.0
         with:
-          tag_name: v${{ github.ref }}
-          name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-          files: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
-            dist/**/*.exe
-            dist/**/*.dmg
-            dist/**/*.AppImage
-            dist/**/*.snap
+          name: ${{ matrix.os }}
+          path: release
+
+      - name: release
+        uses: softprops/action-gh-release@v0.1.14
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: "release/**"
         env:
-          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

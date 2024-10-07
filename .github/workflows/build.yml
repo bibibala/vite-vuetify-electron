@@ -67,3 +67,4 @@ jobs:
             release/**/*.dmg
             release/**/*.AppImage
             release/**/*.snap
+

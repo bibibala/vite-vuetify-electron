@@ -29,6 +29,7 @@
         ]
       }
     ],
+    "sign": false,
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
   "dmg": {

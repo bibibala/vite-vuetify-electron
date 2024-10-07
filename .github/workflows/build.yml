@@ -48,7 +48,7 @@ jobs:
         id: get_version
         run: |
           version=$(jq -r .version package.json)
-          echo "version=App v$version" >> $GITHUB_ENV
+          echo "version=App-v$version" >> $GITHUB_ENV  # 将空格替换为破折号
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -61,7 +61,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.version }}
+          tag_name: ${{ env.version }}  # 使用合法的 tag 格式
           draft: false
           prerelease: false
         env:

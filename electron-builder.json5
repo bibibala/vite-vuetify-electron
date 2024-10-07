@@ -12,7 +12,7 @@
     "dist-electron"
   ],
   "mac": {
-    "icon": "src/assets/logo.png",
+    "icon": "src/assets/logo512X512.png",
     "target": [
       {
         "target": "dmg",

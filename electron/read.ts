@@ -1,6 +1,6 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import X2js from 'x2js';
+import * as fs from "fs/promises";
+import * as path from "path";
+import X2js from "x2js";
 
 interface StringResource {
   name: string;
@@ -16,7 +16,7 @@ class AndroidResourceFinder {
 
   constructor(rootPath: string) {
     this.rootPath = rootPath;
-    this.currentLanguage = 'values'; // 默认语言文件夹
+    this.currentLanguage = "values"; // 默认语言文件夹
   }
 
   async findLanguageFolders(): Promise<string[]> {
@@ -45,10 +45,10 @@ class AndroidResourceFinder {
     const itemPath = path.join(folderPath, item);
     const stats = await fs.stat(itemPath);
 
-    if (itemPath.indexOf(path.sep + 'build' + path.sep) === -1) {
+    if (itemPath.indexOf(path.sep + "build" + path.sep) === -1) {
       if (stats.isDirectory()) {
-        if (item.startsWith('values')) {
-          const stringsPath = path.join(itemPath, 'strings.xml');
+        if (item.startsWith("values")) {
+          const stringsPath = path.join(itemPath, "strings.xml");
           try {
             await fs.access(stringsPath);
             if (!this.languageList.includes(item)) {
@@ -78,7 +78,7 @@ class AndroidResourceFinder {
     const itemPath = path.join(folderPath, item);
     const stats = await fs.stat(itemPath);
 
-    if (itemPath.indexOf(path.sep + 'build' + path.sep) === -1) {
+    if (itemPath.indexOf(path.sep + "build" + path.sep) === -1) {
       if (stats.isDirectory()) {
         // 确保递归调用
         await this.traverseFolderForResources(itemPath);
@@ -93,17 +93,17 @@ class AndroidResourceFinder {
     const parentName = path.basename(parentPath);
     const fileName = path.basename(filePath);
 
-    if (parentName === this.currentLanguage && fileName === 'strings.xml') {
+    if (parentName === this.currentLanguage && fileName === "strings.xml") {
       await this.readXmlFile(filePath);
     }
   }
 
   private async readXmlFile(filePath: string): Promise<void> {
     try {
-      const data = await fs.readFile(filePath, 'utf8');
+      const data = await fs.readFile(filePath, "utf8");
       this.parseXml(data, filePath);
     } catch (err) {
-      console.error('读取文件失败:', err);
+      console.error("读取文件失败:", err);
     }
   }
 
@@ -126,7 +126,7 @@ class AndroidResourceFinder {
         this.stringList.push({
           name: `${this.getParentDirection(filePath, 5)}.${res._name}`,
           text: res.__text,
-          from: filePath.replace(this.rootPath, ''),
+          from: filePath.replace(this.rootPath, ""),
         });
       });
     }

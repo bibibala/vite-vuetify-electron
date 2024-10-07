@@ -1,17 +1,14 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import vuetify from '@/plugins/vuetify';
-import routes from '@/router/index';
-import '@/assets/style/bar.css';
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import Vuetify from "./plugins/vuetify";
+import "./assets/style/bar.css";
 
 const app = createApp(App);
 
-app.use(vuetify);
-app.use(routes);
+app.use(router);
+app.use(store);
+app.use(Vuetify);
 
-app.mount('#app').$nextTick(() => {
-  // Use contextBridge
-  window.ipcRenderer.on('main-process-message', (_event, message) => {
-    console.log(message);
-  });
-});
+app.mount("#app");

@@ -7,13 +7,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const tab = ref(0);
 
-const items = [
-  { text: 'Home', icon: 'mdi-clock' },
-];
+const items = [{ text: "Home", icon: "mdi-clock" }];
 </script>
 
 <style scoped></style>

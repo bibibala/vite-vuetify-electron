@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import PageLayout from '@/components/PageLayout.vue';
+import { ref } from "vue";
+import PageLayout from "../../components/PageLayout.vue";
 
-const rootPath = ref('');
+const rootPath = ref("");
 const keyValueList = ref([]);
 
 function selectFiles(source: string) {
@@ -10,17 +10,17 @@ function selectFiles(source: string) {
   window.ipcRenderer.selectOver(async (_, response) => {
     if (response) {
       rootPath.value = response.response.filePaths[0];
-      console.time('readDirTimer'); // 开始计时
+      console.time("readDirTimer"); // 开始计时
       keyValueList.value = await window.ipcRenderer.readDir(rootPath.value);
-      console.timeEnd('readDirTimer'); // 结束计时并输出时间
+      console.timeEnd("readDirTimer"); // 结束计时并输出时间
     }
   });
 }
 
 const headers = [
-  { title: 'KEY', value: 'name' },
-  { title: 'VALUE', value: 'text' },
-  { title: '路径', value: 'from' },
+  { title: "KEY", value: "name" },
+  { title: "VALUE", value: "text" },
+  { title: "路径", value: "from" },
 ];
 </script>
 

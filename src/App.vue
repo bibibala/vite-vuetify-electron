@@ -8,5 +8,5 @@
 </template>
 
 <script lang="ts" setup>
-import LeftMenu from './Layout/index.vue';
+import LeftMenu from "./Layout/index.vue";
 </script>

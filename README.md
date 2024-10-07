@@ -1,9 +1,5 @@
 # Vite Vuetify electron
 
-## 项目截图
-
-![screenshot](/src/assets/img.png)
-
 ## Install the dependencies
 
 ```bash

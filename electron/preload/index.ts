@@ -1,8 +1,8 @@
-import { AndroidResourceFinder } from './utils/read.ts';
-import { contextBridge, ipcRenderer } from 'electron';
+import { ipcRenderer, contextBridge } from "electron";
+import { AndroidResourceFinder } from "../read";
 
 // --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
+contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args;
     return ipcRenderer.on(channel, (event, ...args) =>
@@ -23,8 +23,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   // You can expose other APTs you need here.
-  select: (args: any) => ipcRenderer.send('select', args),
-  selectOver: (args: any) => ipcRenderer.on('selectOver', args),
+  // ...
+  select: (args: any) => ipcRenderer.send("select", args),
+  selectOver: (args: any) => ipcRenderer.on("selectOver", args),
   readDir: async (dirPath: string) => {
     if (dirPath) {
       const finder = new AndroidResourceFinder(dirPath);
@@ -45,10 +46,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
           }));
         });
       } catch (error) {
-        console.error('Error processing resources:', error);
+        console.error("Error processing resources:", error);
       }
     } else {
-      console.log('file select cancel');
+      console.log("file select cancel");
     }
-  }
+  },
 });

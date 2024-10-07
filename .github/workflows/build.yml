@@ -46,7 +46,9 @@ jobs:
 
       - name: Get Version
         id: get_version
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+        run: |
+          version=$(jq -r .version package.json)
+          echo "version=App v$version" >> $GITHUB_ENV
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -60,7 +62,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.version }}
-          release_name: Release ${{ env.version }}
           draft: false
           prerelease: false
         env:

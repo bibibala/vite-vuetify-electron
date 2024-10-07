@@ -21,14 +21,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
       - name: Build for ${{ matrix.platform }}
         run: |
-          npm run build -- --${{ matrix.platform }}
+          npm run build
+        env:
+          ELECTRON_PLATFORM_NAME: ${{ matrix.platform }} # electron-builder 依据此变量打包不同平台的应用
 
       - name: Archive build files
         run: |
@@ -54,18 +56,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: electron-app-win32
-          path: release/win32
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: electron-app-linux
-          path: release/linux
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: electron-app-mac
-          path: release/mac
+          name: electron-app-${{ matrix.platform }}
+          path: release/${{ matrix.platform }}
 
       - name: Create GitHub Release
         id: create_release
@@ -86,4 +78,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-

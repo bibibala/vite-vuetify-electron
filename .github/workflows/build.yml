@@ -17,10 +17,10 @@
 
     steps:
       - name: Check out git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@4
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@4
         with:
           node-version: "20"
 

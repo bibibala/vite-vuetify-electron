@@ -17,11 +17,8 @@ jobs:
           - os: windows-latest
             platform: windows
           - os: macos-latest
-            platform: mac-intel
-            arch: x64
-          - os: macos-14
-            platform: mac-arm
-            arch: arm64
+            platform: mac
+            arch: [x64, arm64]
 
     runs-on: ${{ matrix.os }}
 
@@ -40,17 +37,28 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Electron app
+      - name: Build Electron app for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          for arch in ${{ toJson(matrix.arch) }}; do
+            echo "Building for macOS $arch"
+            npm run build -- --mac --arch=$arch
+          done
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Build Electron app for non-macOS
+        if: matrix.os != 'macos-latest'
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          ELECTRON_ARCH: ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.platform }}-${{ matrix.arch }}-build
+          name: ${{ matrix.platform }}-build
           path: |
             release/**/*.exe
             release/**/*.dmg

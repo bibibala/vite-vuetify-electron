@@ -59,7 +59,6 @@ jobs:
 
       - name: List build output
         run: |
-          ls -R release
           ls -R dist
 
       - name: Upload artifacts
@@ -67,10 +66,10 @@ jobs:
         with:
           name: ${{ matrix.platform }}-build
           path: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
+            dist/**/*.exe
+            dist/**/*.dmg
+            dist/**/*.AppImage
+            dist/**/*.snap
 
       - name: Create Release
         id: create_release
@@ -81,9 +80,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            release/**/*.exe
-            release/**/*.dmg
-            release/**/*.AppImage
-            release/**/*.snap
+            dist/**/*.exe
+            dist/**/*.dmg
+            dist/**/*.AppImage
+            dist/**/*.snap
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}

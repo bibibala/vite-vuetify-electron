@@ -44,11 +44,17 @@ jobs:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Get Version
-        id: get_version
+      - name: Get Version (Linux/macOS)
+        if: runner.os != 'Windows'
+        id: get_version_unix
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Get Version (Windows)
+        if: runner.os == 'Windows'
+        id: get_version_windows
         run: |
-          version=$(jq -r .version package.json)
-          echo "version=App-v$version" >> $GITHUB_ENV  # 将空格替换为破折号
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "version=$version" >> $env:GITHUB_ENV
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -61,7 +67,8 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.version }}  # 使用合法的 tag 格式
+          tag_name: ${{ env.version }}
+          release_name: Release ${{ env.version }}
           draft: false
           prerelease: false
         env:

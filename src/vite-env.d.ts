@@ -14,6 +14,7 @@ declare global {
       select: (args: any) => void;
       selectOver: (args: any) => void;
       readDir: (pathRoot: string) => string[];
+      showMessageBox: (type: string) => void;
     };
   }
 }

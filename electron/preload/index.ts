@@ -52,4 +52,6 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
       console.log("file select cancel");
     }
   },
+  showMessageBox: (type: string) =>
+    ipcRenderer.invoke("show-message-box", type),
 });

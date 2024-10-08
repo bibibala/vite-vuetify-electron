@@ -17,6 +17,10 @@ function selectFiles(source: string) {
   });
 }
 
+function open(type) {
+  window.ipcRenderer.showMessageBox(type);
+}
+
 const headers = [
   { title: "KEY", value: "name" },
   { title: "VALUE", value: "text" },
@@ -35,6 +39,7 @@ const headers = [
       >
         <template #append>
           <v-btn @click="selectFiles('')">选择目录</v-btn>
+          <v-btn @click="open('A')">弹窗</v-btn>
         </template>
       </v-text-field>
     </template>

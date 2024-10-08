@@ -2,7 +2,8 @@ name: Build and Release Electron App
 
 on:
   push:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -10,48 +11,51 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
-        arch: [x64, arm64]
-        exclude:
-          - os: windows-latest
-            arch: arm64
-        include:
-          - os: windows-latest
-            arch: ia32
+        os: [windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out Git repository
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
 
-      - name: Build Electron app
-        env:
-          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-        run: npm run build -- --${{ matrix.arch }}
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Build and release Windows x64
+        if: matrix.os == 'windows-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-        with:
-          tag_name: v${{ github.run_number }}-${{ github.run_id }}  # Modified tag name
-          release_name: Release v${{ github.run_number }}
-          draft: false
-          prerelease: false
+        run: npm run build:winx64
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Build and release Windows ia32
+        if: matrix.os == 'windows-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+        run: npm run build:winia32
+
+      - name: Build and release macOS Intel
+        if: matrix.os == 'macos-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+        run: npm run build:intel
+
+      - name: Build and release macOS ARM
+        if: matrix.os == 'macos-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+        run: npm run build:arm
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release/your-app-name*
-          asset_name: your-app-name-${{ matrix.os }}-${{ matrix.arch }}
-          asset_content_type: application/octet-stream
+          name: ${{ matrix.os }}-builds
+          files: |
+            release/**/*.exe
+            release/**/*.dmg
+            release/**/*.snap
+          if-no-files-found: error

@@ -2,6 +2,7 @@ import path from "node:path";
 import os from "node:os";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+// import { get } from "../koffi";
 import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
 
 const require = createRequire(import.meta.url);
@@ -92,4 +93,8 @@ ipcMain.on("select", async (event, args = {}) => {
   if (response) {
     event.reply("selectOver", { args, response });
   }
+});
+
+ipcMain.handle("show-message-box", async (event, type) => {
+  //
 });

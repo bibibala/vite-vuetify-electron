@@ -1,86 +1,57 @@
-name: Build Electron App
+name: Build and Release Electron App
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-          - os: windows-latest
-            platform: windows
-          - os: macos-latest
-            platform: mac
-            arch: x64
-          - os: macos-14
-            platform: mac
-            arch: arm64
-
+  release:
     runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v4
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        arch: [x64, arm64]
+        exclude:
+          - os: windows-latest
+            arch: arm64
+        include:
+          - os: windows-latest
+            arch: ia32
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '20'
 
-      - name: Set npm registry mirror
-        run: npm config set registry https://registry.npmjs.org/
-
       - name: Install dependencies
-        run: npm install
-
-      - name: Get package version
-        id: package_version
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: npm ci
 
       - name: Build Electron app
-        run: |
-          if [ "${{ matrix.platform }}" = "mac" ]; then
-            npm run build -- --mac --${{ matrix.arch }}
-          elif [ "${{ matrix.platform }}" = "windows" ]; then
-            npm run build -- --win --x64
-          elif [ "${{ matrix.platform }}" = "linux" ]; then
-            npm run build -- --linux --x64
-          fi
         env:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: List build output
-        run: |
-          ls -R dist || true
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.platform }}-${{ matrix.arch || 'x64' }}-build
-          path: |
-            dist/*.dmg
-            dist/*-setup.exe
-            dist/*.AppImage
-            dist/*.snap
+        run: npm run electron:build -- --${{ matrix.arch }}
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.package_version.outputs.VERSION }}
-          name: ${{ github.event.repository.name }} v${{ steps.package_version.outputs.VERSION }}
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
           draft: false
           prerelease: false
-          files: |
-            dist/*.dmg
-            dist/*-setup.exe
-            dist/*.AppImage
-            dist/*.snap
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/your-app-name*
+          asset_name: your-app-name-${{ matrix.os }}-${{ matrix.arch }}
+          asset_content_type: application/octet-stream

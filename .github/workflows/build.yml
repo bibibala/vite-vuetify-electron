@@ -27,32 +27,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6.0.2
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          STORE_PATH=$(pnpm store path)
-          echo "STORE_PATH=$STORE_PATH" >> $GITHUB_ENV
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Build Electron app
         env:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE }}
-        run: pnpm run electron:build -- --${{ matrix.arch }}
+        run: npm run electron:build -- --${{ matrix.arch }}
 
       - name: Create Release
         id: create_release
